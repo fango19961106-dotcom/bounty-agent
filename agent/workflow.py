@@ -81,13 +81,15 @@ class KpiSnapshot:
     model_corrections: int         # 模型修正次數
     contradictions_found: int      # 矛盾狩獵收穫
     reusable_patterns: int         # 可重用信任邊界模式
+    total_cost_usd: float = 0.0    # 成本軸：總燒咗幾多錢
 
 
 class Orchestrator:
     """泳道管理器：並行上限、優先級重排、每日 standup。"""
 
-    def __init__(self, scope_gate: ScopeGate) -> None:
+    def __init__(self, scope_gate: ScopeGate, cost_tracker=None) -> None:
         self.scope_gate = scope_gate
+        self.cost_tracker = cost_tracker   # agent.cost.CostTracker（可選）
         self.lanes: list[Lane] = []
         self.model_corrections = 0
         self.contradictions = 0
@@ -121,4 +123,5 @@ class Orchestrator:
             model_corrections=self.model_corrections,
             contradictions_found=self.contradictions,
             reusable_patterns=self.reusable_patterns,
+            total_cost_usd=self.cost_tracker.total_usd() if self.cost_tracker else 0.0,
         )
